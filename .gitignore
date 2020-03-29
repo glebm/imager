@@ -7,3 +7,4 @@ modules.squashfs.bak
 mininit-syspart
 images/
 temp/
+/tmp-data/

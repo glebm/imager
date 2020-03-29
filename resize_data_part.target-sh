@@ -43,5 +43,16 @@ trap - EXIT
 mount_data_partition
 
 rm /media/data/local/etc/init.d/S00resize
+
+# Remove the /media/data/local directory if it's empty
+if rmdir /media/data/local/etc/init.d/; then
+	if rmdir /media/data/local/etc/; then
+		if rmdir /media/data/local/; then
+			# In an if statement to prevent set -e from stopping the script.
+			echo 'Removed /media/data/local'
+		fi
+	fi
+fi
+
 rm /media/data/resize_data_part.sh
 rm "$0"
