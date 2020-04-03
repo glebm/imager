@@ -16,16 +16,27 @@ mount_data_partition() {
 	/bin/mount -o remount,ro /media
 }
 
+unmount_data_partition() {
+	echo "Unmounting the partition..."
+	/bin/mount -o remount,rw /media
+	if ! /bin/umount /media/data; then
+		echo "Umount failed. Trying again in 3 seconds..."
+		sleep 3
+		if ! /bin/umount /media/data; then
+			echo "Failed to unmount the partition. Aborting resize."
+			return 1
+		fi
+	fi
+	/bin/mount -o remount,ro /media
+}
+
 clear
 echo 1 > /sys/devices/virtual/vtconsole/vtcon1/bind
 echo "Resizing the data partition."
 echo "This will take a few minutes"
 
 # Unmount data partition before resizing for faster resizing.
-echo "Unmounting the partition..."
-/bin/mount -o remount,rw /media
-/bin/umount /media/data
-/bin/mount -o remount,ro /media
+unmount_data_partition
 # Try to remount the data partition on error (early EXIT is an error).
 trap mount_data_partition EXIT
 echo
