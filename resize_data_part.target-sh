@@ -53,11 +53,15 @@ echo
 echo "Updating partition table..."
 SFDISK_OPTS="--no-reread --quiet -uS -N ${PART_NUM}"
 # Older versions of sfdisk do not support --no-tell-kernel.
-if sfdisk --help | grep -- --no-tell-kernel; then
+HAS_NO_TELL_KERNEL=n
+if sfdisk --help | grep -- --no-tell-kernel > /dev/null; then
+	HAS_NO_TELL_KERNEL=y
 	SFDISK_OPTS="${SFDISK_OPTS} --no-tell-kernel"
 fi
 echo "${START},${SIZE}" | sfdisk ${SFDISK_OPTS} /dev/${DEVICE}
-echo "Re-reading error above is expected."
+if [ "$HAS_NO_TELL_KERNEL" = n ]; then
+	echo "Re-reading error above is expected."
+fi
 resizepart /dev/${DEVICE} ${PART_NUM} ${SIZE}
 echo
 
