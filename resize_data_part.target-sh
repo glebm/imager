@@ -2,6 +2,14 @@
 
 set -e
 
+on_error() {
+	echo "ERROR. Continuing in 10 seconds..."
+	sleep 10
+}
+
+# Early exit is an error. This trap is cleared before normal exit.
+trap on_error EXIT
+
 DEVICE=mmcblk0
 PART_NUM=2
 
@@ -38,7 +46,8 @@ echo "This will take a few minutes"
 # Unmount data partition before resizing for faster resizing.
 unmount_data_partition
 # Try to remount the data partition on error (early EXIT is an error).
-trap mount_data_partition EXIT
+trap - EXIT
+trap 'on_error; mount_data_partition' EXIT
 echo
 
 echo "Updating partition table..."
