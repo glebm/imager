@@ -65,6 +65,10 @@ fi
 resizepart /dev/${DEVICE} ${PART_NUM} ${SIZE}
 echo
 
+# Check partition to prevent resize from failling
+e2fsck -f /dev/${DEVICE}p${PART_NUM}
+
+# Then resize
 resize2fs /dev/${DEVICE}p${PART_NUM}
 
 # Clear the trap that attempts to mount the partition.
